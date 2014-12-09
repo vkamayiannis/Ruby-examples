@@ -1,3 +1,8 @@
+#In order to run the following arguments must be passed:
+# -t interval : -t inteval : The interval in seconds used to check if the process runs
+# -p processname: The process name to check if is running
+# -e executable: The executable to run if the process defined is not running
+
 require 'win32ole'
 
 INTERVALARGUMENT = "-t"
