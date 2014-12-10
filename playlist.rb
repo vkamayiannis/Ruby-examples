@@ -1,54 +1,72 @@
-PLAYLIST_EXTENSION = ".m3u"
-SUPPORTED_EXTENSION = ".mp3"
+module Playlist
+  PLAYLIST_EXTENSION = ".m3u"
+  SUPPORTED_EXTENSION = ".mp3"
 
-def init_dir_array(parent)
-  directories = []
-  sub = []
-  Dir.foreach(parent) do |dir|
-    dirpath = parent + "\\" + dir
-    if File.directory?(dirpath) && dir != "." && dir != ".."
+  #Function is outside of class for educational purposes
+  def Playlist.init_dir_array(parent)
+    directories = []
+    sub = []
+    Dir.foreach(parent) do |dir|
+      dirpath = parent + "\\" + dir
+      if File.directory?(dirpath) && dir != "." && dir != ".."
         directories << dirpath
-		directories = directories + init_dir_array(dirpath)
-	end
+        directories = directories + init_dir_array(dirpath)
+      end
+    end
+    directories
   end
-  directories
+
+  class PlayListError < StandardError
+
+  end
+  class Mp3PlayList
+    attr_writer :dir_array, :filename
+
+    def initialize(parent_dir, num_of_tracks)
+      @parent_dir = parent_dir
+      @num_of_tracks = num_of_tracks
+      @dir_array = Playlist::init_dir_array(@parent_dir)
+    end
+
+    def create
+      i = 0
+      begin
+        file = File.open(@filename, "w")
+        while i < @num_of_tracks
+          active_directory = @dir_array[rand(@dir_array.length)]
+          files = []
+          mp3s = []
+          files = Dir.entries(active_directory).select{|f| !File.directory? f}
+          files.each_index  {|i| files[i] = active_directory + "\\" + files[i] }
+          files.each do |f|
+            #For some reason this did not work
+            #if File.extname(f) != SUPPORTED_EXTENSION
+            # files.delete(f)
+            #end
+            if File.extname(f) == Playlist::SUPPORTED_EXTENSION
+              mp3s << f
+            end
+          end
+          if mp3s.length > 0
+            added_file = mp3s[rand(mp3s.length)] + "\n"
+            file.write(added_file)
+            i += 1
+          end
+        end
+      rescue
+        raise PlayListError.new("Error creating playlist")
+      ensure
+        file.close unless file == nil
+      end
+    end
+  end
 end
 
 print "Enter the parent directory: "
 parent_dir = gets.chomp
 print "Enter the desired number of tracks in the playlist: "
 num_of_tracks = gets.chomp.to_i
+pl = Playlist::Mp3PlayList.new(parent_dir, num_of_tracks)
 print "Enter the filename of the playlist (m3u extension will be added: "
-filename = gets.chomp + PLAYLIST_EXTENSION
-directories = init_dir_array(parent_dir)
-i = 0
-begin
-    file = File.open(filename, "w") 
-	while i < num_of_tracks
-	  active_directory = directories[rand(directories.length)]
-	  #puts "ACTIVE DIRECTORY #{active_directory}"
-	  files = []
-	  mp3s = []
-	  files = Dir.entries(active_directory).select{|f| !File.directory? f}
-	  files.each_index  {|i| files[i] = active_directory + "\\" + files[i] }
-	  files.each do |f|
-	    #For some reason this did not work
-		#if File.extname(f) != SUPPORTED_EXTENSION
-		# files.delete(f)
-		#end
-		#puts f
-		if File.extname(f) == SUPPORTED_EXTENSION
-		  mp3s << f
-		end
-	  end
-	  if mp3s.length > 0 
-	    added_file = mp3s[rand(mp3s.length)] + "\n"
-	    file.write(added_file)
-	    i += 1
-	  end
-	end
-rescue 
-  puts "Error saving file"
-ensure
-   file.close unless file == nil
-end
+pl.filename = gets.chomp + Playlist::PLAYLIST_EXTENSION
+pl.create
