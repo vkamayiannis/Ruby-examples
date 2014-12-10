@@ -17,10 +17,10 @@ module Playlist
   end
 
   class PlayListError < StandardError
-
   end
+
   class Mp3PlayList
-    attr_writer :dir_array, :filename
+    attr_writer :filename
 
     def initialize(parent_dir, num_of_tracks)
       @parent_dir = parent_dir
