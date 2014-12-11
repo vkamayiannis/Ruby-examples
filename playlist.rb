@@ -70,6 +70,10 @@ end
 
 print "Enter the parent directory: "
 parent_dir = gets.chomp
+if !Dir.exists?(parent_dir)
+  puts "Invalid directory"
+  exit(0)
+end
 print "Enter the desired number of tracks in the playlist: "
 num_of_tracks = gets.chomp.to_i
 print "Enter the filename of the playlist (m3u extension will be added: "
