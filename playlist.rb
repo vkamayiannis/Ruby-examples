@@ -1,4 +1,5 @@
 module Playlist
+
   PLAYLIST_EXTENSION = ".m3u"
   SUPPORTED_EXTENSION = ".mp3"
 
@@ -10,6 +11,7 @@ module Playlist
       dirpath = parent + "\\" + dir
       if File.directory?(dirpath) && dir != "." && dir != ".."
         directories << dirpath
+        print "."
         directories = directories + init_dir_array(dirpath)
       end
     end
@@ -25,6 +27,7 @@ module Playlist
     def initialize(parent_dir, num_of_tracks)
       @parent_dir = parent_dir
       @num_of_tracks = num_of_tracks
+      puts "Initializing directories"
       @dir_array = Playlist::init_dir_array(@parent_dir)
     end
 
@@ -56,7 +59,10 @@ module Playlist
       rescue
         raise PlayListError.new("Error creating playlist")
       ensure
-        file.close unless file == nil
+        if file != nil
+          file.close
+          puts "\nPlaylist created successfully"
+        end
       end
     end
   end
@@ -66,7 +72,8 @@ print "Enter the parent directory: "
 parent_dir = gets.chomp
 print "Enter the desired number of tracks in the playlist: "
 num_of_tracks = gets.chomp.to_i
-pl = Playlist::Mp3PlayList.new(parent_dir, num_of_tracks)
 print "Enter the filename of the playlist (m3u extension will be added: "
-pl.filename = gets.chomp + Playlist::PLAYLIST_EXTENSION
+filename = gets.chomp + Playlist::PLAYLIST_EXTENSION
+pl = Playlist::Mp3PlayList.new(parent_dir, num_of_tracks)
+pl.filename = filename
 pl.create
