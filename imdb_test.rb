@@ -1,0 +1,16 @@
+require 'rubygems'
+require 'nokogiri'
+require 'open-uri'
+
+url = 'http://www.imdb.com/title/tt2802144/fullcredits?ref_=tt_ql_1'
+doc = Nokogiri::HTML(open(url))
+doc.css("//table[@class='cast_list']/tr/td").each do |item|
+	name = item.css(".itemprop") .text
+	if name != '' 
+	  puts name
+	end
+	#character = item.css(".character").text
+	#puts character.dump
+	#character = doc.at_css("//td[@class='character']/div")
+	#puts "#{name} - #{character}"
+end
