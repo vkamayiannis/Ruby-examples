@@ -6,4 +6,5 @@ while x <= number
   fact *= x
   x += 1
 end
+puts "test for git from koding"
 puts fact
